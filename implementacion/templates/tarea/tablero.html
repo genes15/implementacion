@@ -1,0 +1,159 @@
+{% extends "../base.html" %}
+
+{% block content %}
+    <style>
+        /* Estilo para alinear label e input en una misma línea */
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            margin-right: 10px; /* Espacio entre label y el input */
+        }
+
+        .form-group input {
+            padding: 5px;
+            width: 200px; /* Ancho del campo de texto */
+        }
+    </style>
+    <!-- Tabla con 4 secciones y bordes visibles, con ancho y alto personalizado -->
+    <table style="border-collapse: collapse; text-align: center;">
+        <tr>
+            <!-- Sección 1 (Ancho: 200px, Alto: 100px) -->
+            <td style="border: 1px solid black; width: 450px; height: 420px;">Sección 1</td>
+            <!-- Sección 2 (Ancho: 300px, Alto: 150px) -->
+            <td style="border: 1px solid black; width: 1100px; height: 420px;">Sección 2</td>
+        </tr>
+        <tr>
+            <!-- Sección 3 (Ancho: 250px, Alto: 200px) -->
+            <td style="border: 1px solid black; width: 250px; height: 160px;">
+                <button style="margin: 10px;">Eliminar Tarea</button>
+                <button style="margin: 10px;">Reiniciar Tarea</button>
+                <button style="margin: 10px;">Detener Tarea</button>
+
+                <!-- Botón que abre el modal -->
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#taskModal">
+                    Abrir Modal
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="taskModalLabel">Seleccionar Opciones</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="taskForm" method="POST" action="{% url 'process_task' %}">
+                                    {% csrf_token %}
+                                <!-- <form id="taskForm"> -->
+                                    <div class="row">
+                                        <div class="form-group col-md-6" >
+                                            <label for="nombre">Nombre:</label>
+                                            <input type="text" id="nombre" name="name" placeholder="Nombre del proceso">
+                                        </div>
+                                        <!-- <div class="group col-md-6" >
+
+                                            <label>
+                                                <input type="radio" name="taskOrigin" value="1" id="radio1"> CLIC <br>
+                                                <input type="radio" name="taskOrigin" value="2" id="radio2"> SF
+                                            </label>
+
+                                        </div> -->
+                                    </div>
+
+                                    <!-- <div class="mb-3">
+                                        <label for="multiSelect1" class="form-label">Departamentos</label>
+
+                                        <select class="js-example-basic-multiple form-control" name="states[]" multiple="multiple" id="multiSelect1" style="width: 100%;">
+                                            {% for departamento in Departamentos %}
+                                            <option value="{{ departamento.id }}">{{ departamento.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="multiSelect2" class="form-label">Municipios</label>
+
+                                        <select class="js-example-basic-multiple form-control" name="states[]" multiple="multiple" id="multiSelect2" style="width: 100%;">
+                                            {% for municipio in Municipios %}
+                                            <option value="{{ municipio.id }}">{{ municipio.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div> -->
+                                    <div class="mb-3">
+                                        <label for="multiSelect3" class="form-label">Estados</label>
+                                        <!-- Select múltiple con Select2 -->
+                                        <select class="js-example-basic-multiple form-control" name="states[]" multiple="multiple" id="multiSelect3" style="width: 100%;">
+                                            {% for estado in Estados %}
+                                            <option value="{{ estado.id }}">{{ estado.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="multiSelect4" class="form-label">Categorias</label>
+                                        <!-- Select múltiple con Select2 -->
+                                        <select class="js-example-basic-multiple form-control" name="categoris[]" multiple="multiple" id="multiSelect4" style="width: 100%;">
+                                            {% for categoria in Categorias %}
+                                            <option value="{{ categoria.id }}">{{ categoria.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Ejecutar Tarea</button>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                <!-- <button type="button" class="btn btn-primary" onclick="executeTask()">Ejecutar Tarea</button> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </td>
+
+            <!-- Sección 4 (Ancho: 350px, Alto: 250px) -->
+            <td style="border: 1px solid black; width: 350px; height: 160px;">Sección 4</td>
+        </tr>
+    </table>
+    <script>
+        function executeTask() {
+            var tarea=[];
+            // Seleccionamos el select múltiple por su ID
+            var estado = document.getElementById('multiSelect3');
+            
+            // Obtenemos todas las opciones seleccionadas
+            var selectedOptions = Array.from(estado.selectedOptions); // Convertimos a un array
+            
+            // Mapeamos los nombres seleccionados
+            var estados = selectedOptions.map(option => option.text);
+
+            // Seleccionamos el select múltiple por su ID
+            var tipotarea = document.getElementById('multiSelect4');
+            
+            // Obtenemos todas las opciones seleccionadas
+            var selectedOptions = Array.from(tipotarea.selectedOptions); // Convertimos a un array
+            
+            // Mapeamos los nombres seleccionados
+            var tipostareas = selectedOptions.map(option => option.text);
+            
+            tarea.unshift(tipostareas);
+            tarea.unshift(estados);
+            console.log(tarea)
+            // Mostramos los nombres seleccionados en un alert
+            //alert('Departamentos seleccionados: ' + selectedNames.join(', '));
+
+            // Cerrar el modal después de ejecutar la tarea
+            var myModal = new bootstrap.Modal(document.getElementById('taskModal'));
+            myModal.hide();
+            alert('assd')
+        }   
+    </script>
+{% endblock content %}
+
+<!--TODO  al crear la tarea establecer un archivo de configuracion (nombre tarea,munucipio,departamento,estado,tipo tarea)-->
+<!--TODO  archivo de configuracion se debe crear por una cuadro de dialogo de js con campos de seleccion-->
+<!--TODO  archivo de configuracion es un json con dichos campos-->
+
